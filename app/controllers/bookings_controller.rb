@@ -7,6 +7,7 @@ class BookingsController < ApplicationController
     @booking = current_customer.bookings.new(event: @event, ticket: @ticket)
 
     if @booking.save
+      SendEmailConfirmationJob.perform_later(customer_id: @booking.customer.id)
       render json: @booking, status: :created
     else
       render json: @booking.errors, status: :unprocessable_entity

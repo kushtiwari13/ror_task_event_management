@@ -6,7 +6,7 @@ class EventsController < ApplicationController
     @events = Event.all
     render json: @events
   end
-  
+
   def create
     @event = current_event_organizer.events.new(event_params)
     if @event.save
@@ -24,6 +24,7 @@ class EventsController < ApplicationController
   def update
     @event = Event.find(params[:id])
     if @event.update(event_params)
+      SendEventUpdateNotificationJob.perform_later(@event.id)
       render json: @event
     else
       render json: @event.errors, status: :unprocessable_entity
