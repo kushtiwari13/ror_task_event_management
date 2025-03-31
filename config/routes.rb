@@ -1,10 +1,16 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  devise_for :event_organizers
+  devise_for :customers
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Events routes with full CRUD operations
+  resources :events do
+    resources :bookings, only: [:create] # Nested booking creation inside events
+  end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Custom routes for event-related actions
+  get '/events/:id/tickets', to: 'events#tickets', as: 'event_tickets'
+  get '/upcoming_events', to: 'events#upcoming'
+
+  # Root route (optional, you can change this)
+  root "events#index"
 end
